@@ -1,21 +1,186 @@
-```txt
-npm install
-npm run dev
+# 중국어 한자 병음 매칭 액티비티
+
+## 프로젝트 개요
+- **이름**: 중국어 한자 병음 매칭 액티비티
+- **목적**: 중국어 학습자가 한자와 병음을 드래그앤드랍으로 연결하여 학습할 수 있는 인터랙티브 웹 액티비티
+- **주요 기능**: 
+  - 드래그앤드랍 인터페이스로 한자와 병음 매칭
+  - 다양한 주제별 액티비티 (인사말, 숫자, 가족 등)
+  - 실시간 점수 및 피드백 시스템
+  - 커스터마이징 가능한 설정 (폰트 크기, 레이아웃, 타이머 등)
+  - JSON 기반 데이터 관리
+
+## URL
+- **개발 서버**: https://3000-iuots20s8e6ues5mkijb0-6532622b.e2b.dev
+- **GitHub**: (배포 후 추가 예정)
+
+## 현재 구현된 기능
+
+### ✅ 완료된 기능
+1. **액티비티 선택 화면**
+   - 기본 인사말 (5개 문제)
+   - 숫자 1-10 (10개 문제) 
+   - 가족 관계 (6개 문제)
+   - 새 액티비티 만들기 기능
+
+2. **드래그앤드랍 액티비티**
+   - 한자 ↔ 병음 양방향 매칭
+   - 실시간 정답/오답 피드백 (초록/빨강 색상)
+   - 진행률 및 점수 표시
+   - 타이머 기능 (설정 가능)
+
+3. **설정 및 커스터마이징**
+   - 한자/병음 폰트 크기 조절 (24-72px / 12-36px)
+   - 레이아웃 간격 및 열 개수 조절
+   - 한국어 뜻 표시 여부
+   - 문제 순서 섞기 옵션
+   - 드래그 방향 설정 (양방향/한자→병음/병음→한자)
+   - 제한시간 설정 (0-600초)
+
+4. **입력 관리 시스템**
+   - 새 한자 추가 폼 (한자, 병음, 뜻)
+   - 기존 한자 편집/삭제
+   - 병음 자동 추천 기능
+   - 빠른 템플릿 적용 (기본/컴팩트/대형)
+
+5. **데이터 관리**
+   - JSON 기반 액티비티 데이터 구조
+   - RESTful API 엔드포인트
+   - 동적 데이터 로딩
+
+### 📋 API 엔드포인트
+```
+GET  /                        - 메인 액티비티 페이지
+GET  /api/activities          - 모든 액티비티 목록 조회
+GET  /api/activities/:id      - 특정 액티비티 상세 조회
+POST /api/activities         - 새 액티비티 저장
+GET  /static/activities.json - 액티비티 JSON 데이터 파일
 ```
 
-```txt
-npm run deploy
+## 데이터 구조
+
+### 액티비티 JSON 구조
+```json
+{
+  "id": "basic-greetings",
+  "title": "기본 인사말", 
+  "description": "중국어 기본 인사말 한자와 병음 매칭",
+  "characters": [
+    {
+      "id": 1,
+      "chinese": "你好",
+      "pinyin": "nǐ hǎo", 
+      "meaning": "안녕하세요",
+      "level": "beginner"
+    }
+  ],
+  "settings": {
+    "chineseFontSize": 48,
+    "pinyinFontSize": 24,
+    "gridColumns": 5,
+    "spacing": 20,
+    "showMeaning": true,
+    "dragDirection": "both",
+    "timeLimit": 0,
+    "shuffleItems": true
+  }
+}
 ```
 
-[For generating/synchronizing types based on your Worker configuration run](https://developers.cloudflare.com/workers/wrangler/commands/#types):
+### 저장 서비스
+- **데이터 형식**: JSON 파일
+- **위치**: `public/static/activities.json`
+- **확장 가능**: Cloudflare D1 Database 연동 준비됨
 
-```txt
-npm run cf-typegen
+## 사용자 가이드
+
+### 1. 액티비티 선택
+- 메인 화면에서 원하는 주제의 액티비티 선택
+- 각 액티비티의 문제 개수와 제한시간 확인 가능
+- "새 액티비티 만들기"로 커스텀 액티비티 생성
+
+### 2. 드래그앤드랍 액티비티 진행
+- 한자 카드와 병음 카드가 섞여서 표시됨
+- 병음을 드래그하여 올바른 한자에 드롭
+- 정답 시 초록색, 오답 시 빨간색 피드백
+- 우상단에서 진행률과 남은 시간 확인
+
+### 3. 설정 편집
+- "설정 편집" 버튼으로 액티비티 커스터마이징
+- 폰트 크기, 레이아웃, 타이머 등 조절
+- 새로운 한자 추가 (자동 병음 추천 기능)
+- 빠른 템플릿으로 일괄 설정 변경
+
+### 4. 결과 확인
+- 하단 점수판에서 정답률 확인
+- 진행률 바로 시각적 피드백
+- "다시 시작" 버튼으로 재시도
+
+## 기술 스택
+
+### 프론트엔드
+- **React 19** - 사용자 인터페이스
+- **TailwindCSS** - 스타일링 및 반응형 디자인
+- **Drag & Drop API** - 네이티브 드래그앤드랍 기능
+- **Chinese/Pinyin 폰트** - 중국어 문자 최적화
+
+### 백엔드
+- **Hono Framework** - 경량 웹 프레임워워크
+- **Cloudflare Workers** - 서버리스 엣지 런타임
+- **Static File Serving** - 정적 파일 및 JSON 데이터 서빙
+
+### 개발 도구
+- **Vite** - 빠른 빌드 도구
+- **Wrangler** - Cloudflare 개발/배포 CLI
+- **PM2** - 프로세스 관리 (개발 환경)
+- **TypeScript** - 타입 안전성
+
+## 배포 상태
+- **플랫폼**: Cloudflare Pages 준비됨
+- **현재 상태**: ✅ 개발 서버 활성화
+- **빌드 상태**: ✅ 성공
+- **마지막 업데이트**: 2025-01-25
+
+## 향후 개발 계획
+
+### 🚧 미구현 기능
+1. **데이터 영속성**
+   - Cloudflare D1 Database 연동
+   - 사용자 생성 액티비티 저장
+   - 학습 진행도 추적
+
+2. **고급 기능**
+   - 음성 발음 재생
+   - 성취 시스템 (배지, 레벨)
+   - 학습 통계 및 분석
+   - 다중 사용자 지원
+
+3. **추가 액티비티 타입**
+   - 문장 구성 게임
+   - 듣기 연습 모드
+   - 쓰기 연습 기능
+
+### 권장 다음 단계
+1. Cloudflare D1 Database 설정
+2. 사용자 인증 시스템 구축
+3. 학습 데이터 분석 대시보드
+4. 모바일 터치 최적화
+5. PWA(Progressive Web App) 변환
+
+## 개발자 참고사항
+
+### 로컬 개발 실행
+```bash
+npm run build        # 프로젝트 빌드
+npm run start        # PM2로 서비스 시작
+npm run restart      # 전체 재시작
+npm run test         # 서비스 테스트
 ```
 
-Pass the `CloudflareBindings` as generics when instantiation `Hono`:
+### 새 액티비티 추가
+1. `public/static/activities.json` 파일 편집
+2. 새로운 액티비티 객체 추가
+3. 서비스 재시작으로 반영
 
-```ts
-// src/index.ts
-const app = new Hono<{ Bindings: CloudflareBindings }>()
-```
+### 병음 자동 추천 확장
+`chinesePinyinMap` 객체에 새로운 한자-병음 매핑 추가하여 자동 추천 기능 향상 가능.

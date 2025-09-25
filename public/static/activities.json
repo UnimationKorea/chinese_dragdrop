@@ -1,0 +1,234 @@
+{
+  "activities": [
+    {
+      "id": "basic-greetings",
+      "title": "기본 인사말",
+      "description": "중국어 기본 인사말 한자와 병음 매칭",
+      "characters": [
+        {
+          "id": 1,
+          "chinese": "你好",
+          "pinyin": "nǐ hǎo",
+          "meaning": "안녕하세요",
+          "level": "beginner"
+        },
+        {
+          "id": 2,
+          "chinese": "谢谢",
+          "pinyin": "xiè xiè",
+          "meaning": "감사합니다",
+          "level": "beginner"
+        },
+        {
+          "id": 3,
+          "chinese": "再见",
+          "pinyin": "zài jiàn",
+          "meaning": "안녕히 가세요",
+          "level": "beginner"
+        },
+        {
+          "id": 4,
+          "chinese": "对不起",
+          "pinyin": "duì bù qǐ",
+          "meaning": "죄송합니다",
+          "level": "beginner"
+        },
+        {
+          "id": 5,
+          "chinese": "没关系",
+          "pinyin": "méi guān xì",
+          "meaning": "괜찮습니다",
+          "level": "beginner"
+        }
+      ],
+      "settings": {
+        "chineseFontSize": 48,
+        "pinyinFontSize": 24,
+        "gridColumns": 5,
+        "spacing": 20,
+        "showMeaning": true,
+        "dragDirection": "both",
+        "timeLimit": 0,
+        "shuffleItems": true
+      }
+    },
+    {
+      "id": "numbers",
+      "title": "숫자",
+      "description": "중국어 숫자 한자와 병음 매칭",
+      "characters": [
+        {
+          "id": 1,
+          "chinese": "一",
+          "pinyin": "yī",
+          "meaning": "하나",
+          "level": "beginner"
+        },
+        {
+          "id": 2,
+          "chinese": "二",
+          "pinyin": "èr",
+          "meaning": "둘",
+          "level": "beginner"
+        },
+        {
+          "id": 3,
+          "chinese": "三",
+          "pinyin": "sān",
+          "meaning": "셋",
+          "level": "beginner"
+        },
+        {
+          "id": 4,
+          "chinese": "四",
+          "pinyin": "sì",
+          "meaning": "넷",
+          "level": "beginner"
+        },
+        {
+          "id": 5,
+          "chinese": "五",
+          "pinyin": "wǔ",
+          "meaning": "다섯",
+          "level": "beginner"
+        },
+        {
+          "id": 6,
+          "chinese": "六",
+          "pinyin": "liù",
+          "meaning": "여섯",
+          "level": "beginner"
+        },
+        {
+          "id": 7,
+          "chinese": "七",
+          "pinyin": "qī",
+          "meaning": "일곱",
+          "level": "beginner"
+        },
+        {
+          "id": 8,
+          "chinese": "八",
+          "pinyin": "bā",
+          "meaning": "여덟",
+          "level": "beginner"
+        },
+        {
+          "id": 9,
+          "chinese": "九",
+          "pinyin": "jiǔ",
+          "meaning": "아홉",
+          "level": "beginner"
+        },
+        {
+          "id": 10,
+          "chinese": "十",
+          "pinyin": "shí",
+          "meaning": "열",
+          "level": "beginner"
+        }
+      ],
+      "settings": {
+        "chineseFontSize": 52,
+        "pinyinFontSize": 26,
+        "gridColumns": 5,
+        "spacing": 15,
+        "showMeaning": true,
+        "dragDirection": "both",
+        "timeLimit": 300,
+        "shuffleItems": true
+      }
+    },
+    {
+      "id": "family",
+      "title": "가족",
+      "description": "중국어 가족 관계 한자와 병음 매칭",
+      "characters": [
+        {
+          "id": 1,
+          "chinese": "爸爸",
+          "pinyin": "bà ba",
+          "meaning": "아버지",
+          "level": "beginner"
+        },
+        {
+          "id": 2,
+          "chinese": "妈妈",
+          "pinyin": "mā ma",
+          "meaning": "어머니",
+          "level": "beginner"
+        },
+        {
+          "id": 3,
+          "chinese": "哥哥",
+          "pinyin": "gē ge",
+          "meaning": "형, 오빠",
+          "level": "beginner"
+        },
+        {
+          "id": 4,
+          "chinese": "弟弟",
+          "pinyin": "dì di",
+          "meaning": "남동생",
+          "level": "beginner"
+        },
+        {
+          "id": 5,
+          "chinese": "姐姐",
+          "pinyin": "jiě jie",
+          "meaning": "언니, 누나",
+          "level": "beginner"
+        },
+        {
+          "id": 6,
+          "chinese": "妹妹",
+          "pinyin": "mèi mei",
+          "meaning": "여동생",
+          "level": "beginner"
+        }
+      ],
+      "settings": {
+        "chineseFontSize": 44,
+        "pinyinFontSize": 22,
+        "gridColumns": 3,
+        "spacing": 25,
+        "showMeaning": true,
+        "dragDirection": "both",
+        "timeLimit": 0,
+        "shuffleItems": true
+      }
+    }
+  ],
+  "templates": {
+    "basic": {
+      "chineseFontSize": 48,
+      "pinyinFontSize": 24,
+      "gridColumns": 5,
+      "spacing": 20,
+      "showMeaning": true,
+      "dragDirection": "both",
+      "timeLimit": 0,
+      "shuffleItems": true
+    },
+    "compact": {
+      "chineseFontSize": 36,
+      "pinyinFontSize": 18,
+      "gridColumns": 6,
+      "spacing": 15,
+      "showMeaning": false,
+      "dragDirection": "pinyin-to-chinese",
+      "timeLimit": 180,
+      "shuffleItems": true
+    },
+    "large": {
+      "chineseFontSize": 60,
+      "pinyinFontSize": 30,
+      "gridColumns": 4,
+      "spacing": 30,
+      "showMeaning": true,
+      "dragDirection": "both",
+      "timeLimit": 0,
+      "shuffleItems": false
+    }
+  }
+}
