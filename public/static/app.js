@@ -151,14 +151,35 @@ function ActivitySelector({ activityType, onStartActivity, onBack }) {
             h('h3', { className: 'text-xl font-semibold mb-2 chinese-character' }, activity.title),
             h('p', { className: 'text-gray-600 text-sm mb-4' }, activity.description),
             h('div', { className: 'text-sm text-gray-500 mb-4' },
-              h('div', null, `총 ${activity.characters.length}개 문제`),
-              activity.settings.timeLimit > 0 && h('div', null, `제한시간: ${Math.floor(activity.settings.timeLimit / 60)}분`)
+              h('div', null, `총 ${
+                activity.characters 
+                  ? activity.characters.length
+                  : activity.sentence 
+                    ? activity.sentence.characters.length 
+                    : 0
+              }개 문제`),
+              activity.settings && activity.settings.timeLimit > 0 && h('div', null, `제한시간: ${Math.floor(activity.settings.timeLimit / 60)}분`)
             ),
-            h('div', { className: 'flex flex-wrap gap-2 mb-4' },
-              ...activity.characters.slice(0, 5).map(char =>
-                h('span', { key: char.id, className: 'chinese-character text-lg bg-white px-2 py-1 rounded' }, char.chinese)
-              ),
-              activity.characters.length > 5 && h('span', { className: 'text-gray-400' }, '...')
+            h('div', { className: 'mb-4' },
+              activity.characters ? (
+                // 단어 액티비티용 - 개별 한자들
+                h('div', { className: 'flex flex-wrap gap-2' },
+                  ...activity.characters.slice(0, 5).map(char =>
+                    h('span', { key: char.id, className: 'chinese-character text-lg bg-white px-2 py-1 rounded' }, char.chinese)
+                  ),
+                  activity.characters.length > 5 && h('span', { className: 'text-gray-400' }, '...')
+                )
+              ) : activity.sentence ? (
+                // 문자 액티비티용 - 전체 문장
+                h('div', { className: 'text-center' },
+                  h('div', { className: 'chinese-character text-2xl bg-blue-50 px-4 py-2 rounded-lg mb-2' }, 
+                    activity.sentence.chinese
+                  ),
+                  h('div', { className: 'text-sm text-gray-600' }, 
+                    `"${activity.sentence.meaning}"`
+                  )
+                )
+              ) : h('div', { className: 'text-gray-400' }, '내용이 없습니다')
             ),
             h('button', {
               onClick: () => onStartActivity(activity.id),
