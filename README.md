@@ -11,8 +11,8 @@
   - JSON 기반 데이터 관리
 
 ## URL
-- **개발 서버**: https://3000-iuots20s8e6ues5mkijb0-6532622b.e2b.dev
-- **GitHub**: (배포 후 추가 예정)
+- **개발 서버**: https://3000-iuots20s8e6ues5mkijb0-6532622b.e2b.dev ✅ 정상 작동
+- **GitHub 저장소**: https://github.com/UnimationKorea/chinese_dragdrop ✅ 업로드 완료
 
 ## 현재 구현된 기능
 
@@ -137,8 +137,10 @@ GET  /static/activities.json - 액티비티 JSON 데이터 파일
 
 ## 배포 상태
 - **플랫폼**: Cloudflare Pages 준비됨
-- **현재 상태**: ✅ 개발 서버 활성화
+- **현재 상태**: ✅ 개발 서버 활성화 및 완전 작동
 - **빌드 상태**: ✅ 성공
+- **React 렌더링**: ✅ 정상 작동 (React 17 + createElement 방식)
+- **드래그앤드랍**: ✅ 완전 구현
 - **마지막 업데이트**: 2025-01-25
 
 ## 향후 개발 계획
