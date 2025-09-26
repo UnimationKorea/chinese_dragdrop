@@ -661,19 +661,41 @@ function CharacterPinyinActivity({ activityType, activityId, onBack }) {
         }, '다시 시작')
       ),
       
-      // 병음 드래그 영역
-      h('div', { className: 'mb-8' },
-        h('h3', { className: 'text-lg font-semibold mb-4 text-center' }, '병음을 드래그하여 해당 글자 위에 올려주세요'),
-        h('div', { className: 'flex flex-wrap justify-center gap-3 p-4 bg-blue-50 rounded-lg' },
-          ...availablePinyin.map(pinyinItem =>
-            h('div', {
-              key: pinyinItem.id,
-              className: `px-4 py-2 bg-blue-500 text-white rounded-lg cursor-grab pinyin-text font-semibold ${pinyinItem.used ? 'opacity-30 cursor-not-allowed' : 'hover:bg-blue-600'}`,
-              draggable: !pinyinItem.used,
-              onDragStart: (e) => handleDragStart(e, pinyinItem),
-              onDragEnd: handleDragEnd,
-              style: { fontSize: `${activityData.settings.pinyinFontSize}px` }
-            }, pinyinItem.pinyin)
+      // 병음 드래그 영역 - 더 직관적인 디자인
+      h('div', { className: 'mb-10' },
+        h('h3', { className: 'text-xl font-bold mb-6 text-center text-gray-700' }, 
+          '🎯 아래 병음을 드래그하여 해당 글자 위에 올려주세요'
+        ),
+        h('div', { className: 'bg-gradient-to-r from-blue-50 to-indigo-50 border-2 border-blue-200 rounded-2xl p-6 shadow-sm' },
+          h('div', { className: 'flex flex-wrap justify-center gap-4' },
+            ...availablePinyin.map(pinyinItem =>
+              h('div', {
+                key: pinyinItem.id,
+                className: `relative px-5 py-3 rounded-xl cursor-grab pinyin-text font-bold transition-all duration-200 select-none ${
+                  pinyinItem.used 
+                    ? 'bg-gray-300 text-gray-500 cursor-not-allowed opacity-50 scale-95' 
+                    : 'bg-blue-500 text-white hover:bg-blue-600 hover:scale-105 hover:shadow-md active:scale-95'
+                }`,
+                draggable: !pinyinItem.used,
+                onDragStart: (e) => handleDragStart(e, pinyinItem),
+                onDragEnd: handleDragEnd,
+                style: { 
+                  fontSize: `${activityData.settings.pinyinFontSize + 2}px`,
+                  minWidth: '50px',
+                  textAlign: 'center'
+                }
+              }, 
+                pinyinItem.pinyin,
+                pinyinItem.used && h('div', {
+                  className: 'absolute -top-1 -right-1 w-5 h-5 bg-gray-500 rounded-full flex items-center justify-center text-white text-xs'
+                }, '✓')
+              )
+            )
+          )
+        ),
+        h('div', { className: 'mt-4 text-center' },
+          h('p', { className: 'text-sm text-gray-500' }, 
+            '💡 팁: 병음을 글자 위 점선 박스에 드래그하면 자동으로 정답 여부를 확인할 수 있어요'
           )
         )
       ),
@@ -707,45 +729,93 @@ function SentenceDisplay({ sentence, settings, userAnswers, feedback, onDragOver
 
   return h('div', { className: 'text-center mb-8' },
     // 문장 의미
-    settings.showMeaning && h('div', { className: 'mb-6 p-4 bg-gray-100 rounded-lg' },
-      h('p', { className: 'text-gray-700 text-lg' }, `"${sentence.meaning}"`)
+    settings.showMeaning && h('div', { className: 'mb-8 p-4 bg-blue-50 rounded-lg border border-blue-200' },
+      h('p', { className: 'text-blue-800 text-lg font-medium' }, `"${sentence.meaning}"`)
     ),
     
-    // 문장 표시 영역
-    h('div', { className: 'inline-block p-8 bg-gradient-to-r from-gray-50 to-blue-50 rounded-xl shadow-inner' },
-      h('div', { className: 'flex items-center justify-center gap-4 flex-wrap' },
+    // 문장 표시 영역 - 더 자연스러운 레이아웃
+    h('div', { className: 'inline-block py-12 px-8 bg-white rounded-2xl shadow-lg border-2 border-gray-100' },
+      h('div', { className: 'flex items-end justify-center gap-1 flex-wrap' },
         ...sentence.characters.map(char => {
           const getFeedbackClass = () => {
             const charFeedback = feedback[char.id];
-            if (charFeedback === 'correct') return 'border-green-500 bg-green-100';
-            if (charFeedback === 'incorrect') return 'border-red-500 bg-red-100';
-            return 'border-gray-300 bg-white';
+            if (charFeedback === 'correct') return 'border-green-400 bg-green-50';
+            if (charFeedback === 'incorrect') return 'border-red-400 bg-red-50';
+            return 'border-blue-200 bg-blue-25';
           };
 
-          return h('div', { key: char.id, className: 'text-center' },
-            // 병음 드롭 영역
+          const getPinyinBackgroundClass = () => {
+            const charFeedback = feedback[char.id];
+            if (charFeedback === 'correct') return 'bg-green-100 text-green-700 border-green-300';
+            if (charFeedback === 'incorrect') return 'bg-red-100 text-red-700 border-red-300';
+            return 'bg-blue-100 text-blue-700 border-blue-300';
+          };
+
+          return h('div', { 
+            key: char.id, 
+            className: 'relative flex flex-col items-center',
+            style: { marginBottom: '8px', marginRight: '4px' }
+          },
+            // 병음 드롭 영역 - 글자 바로 위에 밀착
             h('div', {
-              className: `w-20 h-12 border-2 border-dashed rounded-lg flex items-center justify-center mb-2 transition-all ${getFeedbackClass()}`,
-              onDragOver: onDragOver,
-              onDrop: (e) => onDrop(e, char)
+              className: `min-w-16 h-10 border-2 border-dashed rounded-md flex items-center justify-center mb-1 transition-all duration-200 hover:scale-105 hover:border-solid hover:shadow-md ${getFeedbackClass()}`,
+              onDragOver: (e) => {
+                onDragOver(e);
+                e.currentTarget.classList.add('scale-110', 'border-blue-400', 'bg-blue-50');
+              },
+              onDragLeave: (e) => {
+                e.currentTarget.classList.remove('scale-110', 'border-blue-400', 'bg-blue-50');
+              },
+              onDrop: (e) => {
+                onDrop(e, char);
+                e.currentTarget.classList.remove('scale-110', 'border-blue-400', 'bg-blue-50');
+              },
+              style: { 
+                minHeight: `${Math.max(40, settings.pinyinFontSize + 16)}px`,
+                minWidth: `${Math.max(64, settings.fontSize + 16)}px`
+              }
             },
-              userAnswers[char.id] && h('span', {
-                className: 'pinyin-text font-semibold text-sm',
-                style: { fontSize: `${settings.pinyinFontSize}px` }
-              }, userAnswers[char.id].pinyin)
+              userAnswers[char.id] ? h('div', {
+                className: `pinyin-text font-bold px-2 py-1 rounded-md text-center shadow-sm transform transition-all duration-300 animate-pulse ${getPinyinBackgroundClass()}`,
+                style: { 
+                  fontSize: `${settings.pinyinFontSize}px`,
+                  animation: 'fadeIn 0.3s ease-in'
+                }
+              }, userAnswers[char.id].pinyin) : h('div', {
+                className: 'text-gray-400 text-xs font-medium opacity-60',
+                style: { fontSize: '11px' }
+              }, '드래그')
             ),
-            // 중국어 글자
+            // 중국어 글자 - 병음 영역 바로 아래에 밀착
             h('div', {
-              className: 'chinese-character font-bold',
-              style: { fontSize: `${settings.fontSize}px` }
+              className: 'chinese-character font-black text-gray-800 leading-none select-none',
+              style: { 
+                fontSize: `${settings.fontSize}px`,
+                lineHeight: '0.9',
+                marginTop: '-2px'  // 병음과 글자 사이 간격을 더 좁게
+              }
             }, char.char)
           );
         }),
-        // 물음표나 마침표
-        sentence.chinese.includes('？') && h('div', { 
-          className: 'chinese-character font-bold ml-1',
-          style: { fontSize: `${settings.fontSize}px` }
-        }, '？')
+        // 물음표나 마침표 - 문장 끝에 자연스럽게 배치
+        (sentence.chinese.includes('？') || sentence.chinese.includes('?')) && h('div', { 
+          className: 'relative flex flex-col items-center ml-1',
+          style: { marginBottom: '8px' }
+        },
+          // 물음표 위쪽 빈 공간 (병음 자리와 맞춤)
+          h('div', { 
+            className: 'h-10 mb-1',
+            style: { minHeight: `${Math.max(40, settings.pinyinFontSize + 16)}px` }
+          }),
+          // 물음표
+          h('div', { 
+            className: 'chinese-character font-black text-gray-800',
+            style: { 
+              fontSize: `${settings.fontSize}px`,
+              lineHeight: '1'
+            }
+          }, '？')
+        )
       )
     )
   );

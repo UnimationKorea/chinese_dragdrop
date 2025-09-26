@@ -248,6 +248,30 @@ app.get('/', (c) => {
       border-color: #ef4444;
       background-color: #fee2e2;
     }
+    @keyframes fadeIn {
+      0% {
+        opacity: 0;
+        transform: scale(0.8);
+      }
+      100% {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+    @keyframes bounce {
+      0%, 20%, 50%, 80%, 100% {
+        transform: translateY(0);
+      }
+      40% {
+        transform: translateY(-10px);
+      }
+      60% {
+        transform: translateY(-5px);
+      }
+    }
+    .drop-zone:hover {
+      animation: bounce 0.6s;
+    }
   </style>
 </head>
 <body class="bg-gray-50">
