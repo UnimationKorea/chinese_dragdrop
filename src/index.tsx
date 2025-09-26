@@ -10,12 +10,37 @@ app.use('/api/*', cors())
 // Serve static files
 app.use('/static/*', serveStatic({ root: './public' }))
 
-// API route for getting all activities
-app.get('/api/activities', async (c) => {
+// API route for getting all activity types
+app.get('/api/activity-types', async (c) => {
   try {
-    // For development, serve from local file
-    // In production, this would typically come from a database
-    const sampleActivities = [
+    const activityTypes = [
+      {
+        "id": "word-pinyin-connection",
+        "title": "단어 중국어 병음 연결",
+        "description": "한자 단어와 병음을 드래그앤드롭으로 연결하는 액티비티",
+        "icon": "🔤",
+        "difficulty": "beginner"
+      },
+      {
+        "id": "character-pinyin-connection", 
+        "title": "문자 중국어 병음 연결",
+        "description": "문장 속 각 글자 위에 올바른 병음을 배치하는 액티비티",
+        "icon": "📝",
+        "difficulty": "intermediate"
+      }
+    ];
+    return c.json(activityTypes)
+  } catch (error) {
+    return c.json({ error: 'Failed to load activity types' }, 500)
+  }
+})
+
+// API route for getting activities by type
+app.get('/api/activities/:type', async (c) => {
+  const type = c.req.param('type')
+  try {
+    if (type === 'word-pinyin-connection') {
+      const wordActivities = [
       {
         "id": "basic-greetings",
         "title": "기본 인사말",
@@ -70,19 +95,76 @@ app.get('/api/activities', async (c) => {
           "showMeaning": true, "dragDirection": "both", "timeLimit": 0, "shuffleItems": true
         }
       }
-    ];
-    return c.json(sampleActivities)
+      ];
+      return c.json(wordActivities)
+    } else if (type === 'character-pinyin-connection') {
+      const characterActivities = [
+        {
+          "id": "sentence-1",
+          "title": "기본 문장 연습",
+          "description": "간단한 중국어 문장의 각 글자에 병음 배치",
+          "sentence": {
+            "chinese": "你吃饭了吗？",
+            "pinyin": ["nǐ", "chī", "fàn", "le", "ma"],
+            "meaning": "당신은 밥을 먹었습니까?",
+            "characters": [
+              {"id": 1, "char": "你", "pinyin": "nǐ", "position": 0},
+              {"id": 2, "char": "吃", "pinyin": "chī", "position": 1},
+              {"id": 3, "char": "饭", "pinyin": "fàn", "position": 2},
+              {"id": 4, "char": "了", "pinyin": "le", "position": 3},
+              {"id": 5, "char": "吗", "pinyin": "ma", "position": 4}
+            ]
+          },
+          "settings": {
+            "fontSize": 48,
+            "pinyinFontSize": 24,
+            "spacing": 20,
+            "showMeaning": true,
+            "timeLimit": 0
+          }
+        },
+        {
+          "id": "sentence-2", 
+          "title": "인사 표현",
+          "description": "일상 인사말의 각 글자에 병음 배치",
+          "sentence": {
+            "chinese": "你好吗？",
+            "pinyin": ["nǐ", "hǎo", "ma"],
+            "meaning": "안녕하세요?",
+            "characters": [
+              {"id": 1, "char": "你", "pinyin": "nǐ", "position": 0},
+              {"id": 2, "char": "好", "pinyin": "hǎo", "position": 1},
+              {"id": 3, "char": "吗", "pinyin": "ma", "position": 2}
+            ]
+          },
+          "settings": {
+            "fontSize": 52,
+            "pinyinFontSize": 26,
+            "spacing": 25,
+            "showMeaning": true,
+            "timeLimit": 180
+          }
+        }
+      ];
+      return c.json(characterActivities)
+    } else {
+      return c.json({ error: 'Invalid activity type' }, 400)
+    }
   } catch (error) {
     return c.json({ error: 'Failed to load activities' }, 500)
   }
 })
 
 // API route for getting specific activity data
-app.get('/api/activities/:id', async (c) => {
+app.get('/api/activity/:type/:id', async (c) => {
+  const type = c.req.param('type')
   const id = c.req.param('id')
   try {
     // Get activities from the same data source
-    const activities = await (await app.request('/api/activities')).json();
+    const activitiesResponse = await app.request(`/api/activities/${type}`, {
+      headers: c.req.header()
+    });
+    const activities = await activitiesResponse.json();
     const activity = activities.find(act => act.id === id)
     
     if (!activity) {
