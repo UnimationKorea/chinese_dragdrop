@@ -567,6 +567,7 @@ function CharacterPinyinActivity({ activityType, activityId, onBack }) {
   const [feedback, setFeedback] = useState({});
   const [draggedPinyin, setDraggedPinyin] = useState(null);
   const [availablePinyin, setAvailablePinyin] = useState([]);
+  const [isEditing, setIsEditing] = useState(false);
   
   useEffect(() => {
     if (activityId === 'custom') {
@@ -585,6 +586,7 @@ function CharacterPinyinActivity({ activityType, activityId, onBack }) {
           showMeaning: true, timeLimit: 0
         }
       });
+      setIsEditing(true);
     } else {
       fetch(`/api/activity/${activityType}/${activityId}`)
         .then(res => res.json())
@@ -676,11 +678,19 @@ function CharacterPinyinActivity({ activityType, activityId, onBack }) {
           }, '← 뒤로'),
           h('h1', { className: 'text-2xl font-bold text-gray-800' }, activityData.title)
         ),
-        h('button', {
-          onClick: resetActivity,
-          className: 'px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600 transition'
-        }, '다시 시작')
+        h('div', { className: 'flex gap-2' },
+          h('button', {
+            onClick: () => setIsEditing(!isEditing),
+            className: 'px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition'
+          }, isEditing ? '편집 완료' : '설정 편집'),
+          h('button', {
+            onClick: resetActivity,
+            className: 'px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600 transition'
+          }, '다시 시작')
+        )
       ),
+
+      isEditing && h(CharacterSettingsPanel, { activityData, setActivityData }),
       
       // 병음 드래그 영역 - 더 직관적인 디자인
       h('div', { className: 'mb-10' },
@@ -836,6 +846,241 @@ function SentenceDisplay({ sentence, settings, userAnswers, feedback, onDragOver
               lineHeight: '1'
             }
           }, '？')
+        )
+      )
+    )
+  );
+}
+
+// 문자 액티비티용 설정 패널 컴포넌트
+function CharacterSettingsPanel({ activityData, setActivityData }) {
+  const [newSentence, setNewSentence] = useState({
+    chinese: '',
+    pinyin: '',
+    meaning: ''
+  });
+
+  const updateSettings = (key, value) => {
+    setActivityData(prev => ({
+      ...prev,
+      settings: { ...prev.settings, [key]: value }
+    }));
+  };
+
+  // 중국어 문장을 개별 글자로 분석하는 함수
+  const parseChineseText = (chinese, pinyinString) => {
+    if (!chinese || !pinyinString) return [];
+    
+    const characters = chinese.split('').filter(char => char !== '？' && char !== '。' && char !== '！');
+    const pinyinArray = pinyinString.split(' ').filter(p => p.trim() !== '');
+    
+    return characters.map((char, index) => ({
+      id: index + 1,
+      char: char,
+      pinyin: pinyinArray[index] || '',
+      position: index
+    }));
+  };
+
+  const addSentence = () => {
+    if (newSentence.chinese && newSentence.pinyin && newSentence.meaning) {
+      const characters = parseChineseText(newSentence.chinese, newSentence.pinyin);
+      const pinyinArray = newSentence.pinyin.split(' ').filter(p => p.trim() !== '');
+      
+      setActivityData(prev => ({
+        ...prev,
+        sentence: {
+          chinese: newSentence.chinese,
+          pinyin: pinyinArray,
+          meaning: newSentence.meaning,
+          characters: characters
+        }
+      }));
+      setNewSentence({ chinese: '', pinyin: '', meaning: '' });
+    }
+  };
+
+  const applyTemplate = (templateName) => {
+    const templates = {
+      basic: {
+        fontSize: 48,
+        pinyinFontSize: 24,
+        spacing: 20,
+        showMeaning: true,
+        timeLimit: 0
+      },
+      compact: {
+        fontSize: 36,
+        pinyinFontSize: 18,
+        spacing: 15,
+        showMeaning: false,
+        timeLimit: 180
+      },
+      large: {
+        fontSize: 60,
+        pinyinFontSize: 30,
+        spacing: 30,
+        showMeaning: true,
+        timeLimit: 0
+      }
+    };
+
+    if (templates[templateName]) {
+      setActivityData(prev => ({
+        ...prev,
+        settings: { ...prev.settings, ...templates[templateName] }
+      }));
+    }
+  };
+
+  return h('div', { className: 'bg-gray-50 rounded-lg p-6 mb-8' },
+    h('h3', { className: 'text-xl font-bold mb-6 text-gray-800' }, '🛠️ 문장 액티비티 설정'),
+    
+    // 폰트 및 레이아웃 설정
+    h('div', { className: 'grid grid-cols-1 md:grid-cols-4 gap-4 mb-8' },
+      h('div', null,
+        h('label', { className: 'block text-sm font-medium text-gray-700 mb-2' },
+          `한자 폰트 크기: ${activityData.settings.fontSize}px`
+        ),
+        h('input', {
+          type: 'range',
+          min: 24, max: 72,
+          value: activityData.settings.fontSize,
+          onChange: (e) => updateSettings('fontSize', parseInt(e.target.value)),
+          className: 'w-full'
+        })
+      ),
+      h('div', null,
+        h('label', { className: 'block text-sm font-medium text-gray-700 mb-2' },
+          `병음 폰트 크기: ${activityData.settings.pinyinFontSize}px`
+        ),
+        h('input', {
+          type: 'range',
+          min: 12, max: 36,
+          value: activityData.settings.pinyinFontSize,
+          onChange: (e) => updateSettings('pinyinFontSize', parseInt(e.target.value)),
+          className: 'w-full'
+        })
+      ),
+      h('div', null,
+        h('label', { className: 'block text-sm font-medium text-gray-700 mb-2' },
+          `간격: ${activityData.settings.spacing}px`
+        ),
+        h('input', {
+          type: 'range',
+          min: 10, max: 50,
+          value: activityData.settings.spacing,
+          onChange: (e) => updateSettings('spacing', parseInt(e.target.value)),
+          className: 'w-full'
+        })
+      ),
+      h('div', null,
+        h('label', { className: 'block text-sm font-medium text-gray-700 mb-2' },
+          `제한시간: ${activityData.settings.timeLimit}초`
+        ),
+        h('input', {
+          type: 'range',
+          min: 0, max: 600, step: 30,
+          value: activityData.settings.timeLimit,
+          onChange: (e) => updateSettings('timeLimit', parseInt(e.target.value)),
+          className: 'w-full'
+        })
+      )
+    ),
+
+    // 액티비티 옵션
+    h('div', { className: 'grid grid-cols-1 md:grid-cols-2 gap-8 mb-8' },
+      h('div', { className: 'space-y-4' },
+        h('h4', { className: 'font-bold text-gray-800' }, '액티비티 옵션'),
+        h('label', { className: 'flex items-center' },
+          h('input', {
+            type: 'checkbox',
+            checked: activityData.settings.showMeaning,
+            onChange: (e) => updateSettings('showMeaning', e.target.checked),
+            className: 'mr-3'
+          }),
+          '한국어 뜻 표시'
+        )
+      ),
+      h('div', null,
+        h('h4', { className: 'font-bold text-gray-800 mb-3' }, '빠른 템플릿 적용'),
+        h('div', { className: 'space-y-2' },
+          h('button', {
+            onClick: () => applyTemplate('basic'),
+            className: 'w-full px-3 py-2 bg-blue-100 text-blue-700 rounded hover:bg-blue-200 transition'
+          }, '기본 설정'),
+          h('button', {
+            onClick: () => applyTemplate('compact'),
+            className: 'w-full px-3 py-2 bg-green-100 text-green-700 rounded hover:bg-green-200 transition'
+          }, '컴팩트 설정'),
+          h('button', {
+            onClick: () => applyTemplate('large'),
+            className: 'w-full px-3 py-2 bg-purple-100 text-purple-700 rounded hover:bg-purple-200 transition'
+          }, '대형 설정')
+        )
+      )
+    ),
+
+    // 새 문장 추가
+    h('div', { className: 'border-t border-gray-200 pt-6' },
+      h('h4', { className: 'font-bold text-gray-800 mb-4' }, '📝 새 문장 추가'),
+      h('div', { className: 'grid grid-cols-1 gap-4' },
+        h('div', null,
+          h('label', { className: 'block text-sm font-medium text-gray-700 mb-2' }, '중국어 문장'),
+          h('input', {
+            type: 'text',
+            placeholder: '예: 你好吗？',
+            value: newSentence.chinese,
+            onChange: (e) => setNewSentence(prev => ({ ...prev, chinese: e.target.value })),
+            className: 'w-full px-4 py-3 border rounded-lg chinese-character text-lg'
+          })
+        ),
+        h('div', null,
+          h('label', { className: 'block text-sm font-medium text-gray-700 mb-2' }, '병음 (공백으로 구분)'),
+          h('input', {
+            type: 'text',
+            placeholder: '예: nǐ hǎo ma',
+            value: newSentence.pinyin,
+            onChange: (e) => setNewSentence(prev => ({ ...prev, pinyin: e.target.value })),
+            className: 'w-full px-4 py-3 border rounded-lg pinyin-text'
+          })
+        ),
+        h('div', null,
+          h('label', { className: 'block text-sm font-medium text-gray-700 mb-2' }, '한국어 뜻'),
+          h('input', {
+            type: 'text',
+            placeholder: '예: 안녕하세요?',
+            value: newSentence.meaning,
+            onChange: (e) => setNewSentence(prev => ({ ...prev, meaning: e.target.value })),
+            className: 'w-full px-4 py-3 border rounded-lg'
+          })
+        ),
+        h('button', {
+          onClick: addSentence,
+          className: 'px-6 py-3 bg-green-500 text-white rounded-lg hover:bg-green-600 transition font-bold'
+        }, '✅ 문장 추가')
+      ),
+      h('div', { className: 'mt-4 text-sm text-gray-600 bg-blue-50 p-3 rounded-lg' },
+        h('p', { className: 'mb-1' }, '💡 사용법:'),
+        h('ul', { className: 'list-disc list-inside space-y-1' },
+          h('li', null, '중국어는 물음표(？)나 마침표(。) 포함 가능'),
+          h('li', null, '병음은 각 글자에 대응되도록 공백으로 구분'),
+          h('li', null, '예: "你好吗？" → "nǐ hǎo ma" (3글자)')
+        )
+      )
+    ),
+
+    // 현재 문장 정보
+    activityData.sentence && activityData.sentence.chinese && h('div', { className: 'border-t border-gray-200 pt-6 mt-6' },
+      h('h4', { className: 'font-bold text-gray-800 mb-4' }, '📋 현재 문장'),
+      h('div', { className: 'bg-white p-4 rounded-lg border' },
+        h('div', { className: 'chinese-character text-2xl mb-2' }, activityData.sentence.chinese),
+        h('div', { className: 'pinyin-text text-lg text-blue-600 mb-2' }, 
+          activityData.sentence.pinyin.join(' ')
+        ),
+        h('div', { className: 'text-gray-700' }, `"${activityData.sentence.meaning}"`),
+        h('div', { className: 'text-sm text-gray-500 mt-2' }, 
+          `총 ${activityData.sentence.characters.length}개 글자`
         )
       )
     )
