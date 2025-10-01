@@ -616,6 +616,15 @@ app.get('/', (c) => {
             </div>
             
             <div class="text-center mt-12">
+                <div class="mb-6">
+                    <h3 class="text-xl font-bold text-gray-800 mb-4">🎵 외부 액티비티</h3>
+                    <a href="/external/tone-activity" class="inline-block px-6 py-3 bg-gradient-to-r from-purple-500 to-pink-600 text-white font-bold rounded-lg hover:from-purple-600 hover:to-pink-700 transition-all shadow-lg hover:shadow-xl">
+                        성조 학습 액티비티 →
+                    </a>
+                    <p class="text-sm text-gray-500 mt-2">
+                        중국어 글자 위에 올바른 성조를 드래그하여 배치하는 독립 액티비티
+                    </p>
+                </div>
                 <p class="text-gray-500 text-sm">
                     💡 V2 Enhanced 버전은 완전한 활동 템플릿 가이드를 따라 개발되었습니다
                 </p>
@@ -756,6 +765,68 @@ app.get('/v2', (c) => {
             <div id="root"></div>
         </div>
         <script src="/static/v2-enhanced-app.js"></script>
+    </body>
+    </html>
+  `)
+})
+
+// ==========================================
+// 외부 액티비티 - 성조 학습 (완전히 독립적)
+// Core 시스템에 영향 없음
+// ==========================================
+
+app.get('/external/tone-activity', (c) => {
+  return c.html(`
+    <!DOCTYPE html>
+    <html lang="ko">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>중국어 성조 학습 액티비티</title>
+        <script src="https://cdn.tailwindcss.com"></script>
+        <script crossorigin src="https://unpkg.com/react@17/umd/react.development.js"></script>
+        <script crossorigin src="https://unpkg.com/react-dom@17/umd/react-dom.development.js"></script>
+        <style>
+            .chinese-character {
+                font-family: 'Microsoft YaHei', 'SimHei', 'PingFang SC', sans-serif;
+            }
+            .tone-drag-item {
+                transition: all 0.3s ease;
+                cursor: grab;
+            }
+            .tone-drag-item:active {
+                cursor: grabbing;
+            }
+            .tone-drop-zone {
+                border: 2px dashed #d1d5db;
+                transition: all 0.3s ease;
+            }
+            .tone-drop-zone:hover {
+                animation: pulse 0.6s;
+            }
+            @keyframes pulse {
+                0%, 100% { transform: scale(1); }
+                50% { transform: scale(1.05); }
+            }
+            .fade-in {
+                animation: fadeIn 0.5s ease-in;
+            }
+            @keyframes fadeIn {
+                from { opacity: 0; transform: translateY(10px); }
+                to { opacity: 1; transform: translateY(0); }
+            }
+        </style>
+    </head>
+    <body class="bg-gradient-to-br from-purple-50 to-pink-50 min-h-screen">
+        <div class="p-4">
+            <div class="mb-4 text-center">
+                <a href="/" class="inline-block px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600 transition">
+                    ← 메인으로 돌아가기
+                </a>
+            </div>
+            <div id="root"></div>
+        </div>
+        <script src="/static/tone-activity.js"></script>
     </body>
     </html>
   `)
